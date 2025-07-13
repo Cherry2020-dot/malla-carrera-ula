@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva - Ing. Civil Eléctrica - ULA</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #003366;
+        }
+        .university {
+            text-align: center;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 30px;
+        }
+        .semester-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .semester {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 300px;
+            border-left: 5px solid #0066cc;
+        }
+        .semester h2 {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        .course {
+            background-color: #e6f2ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #0066cc;
+            position: relative;
+        }
+        .course-name {
+            font-weight: bold;
+            color: #003366;
+        }
+        .prereq {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .locked {
+            opacity: 0.6;
+            background-color: #f0f0f0;
+            border-left: 3px solid #999;
+        }
+        .locked .course-name {
+            color: #999;
+        }
+        .completed {
+            background-color: #e6ffe6;
+            border-left: 3px solid #009933;
+        }
+        .elective {
+            background-color: #fff2e6;
+            border-left: 3px solid #ff9900;
+        }
+        .english {
+            background-color: #f0e6ff;
+            border-left: 3px solid #9900cc;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Malla Curricular Interactiva</h1>
+    <div class="university">Universidad de los Lagos - Ingeniería Civil Eléctrica</div>
+
+    <div class="semester-container" id="malla-container">
+        <!-- Los semestres se generarán con JavaScript -->
+    </div>
+
+    <script>
+        // Datos de la malla (ajustados al PDF)
+        const malla = [
+            {
+                semester: 1,
+                courses: [
+                    { id: "mat_intro", name: "Introducción a la Matemática", prereqs: [] },
+                    { id: "taller_ing", name: "Taller de Introducción a la Ingeniería", prereqs: [] },
+                    { id: "hab_com", name: "Habilidades Comunicativas para Ingenieros", prereqs: [] },
+                    { id: "quimica", name: "Química", prereqs: [] },
+                    { id: "electivo1", name: "Electivo Formación Integral I", prereqs: [], elective: true }
+                ]
+            },
+            {
+                semester: 2,
+                courses: [
+                    { id: "calc_intro", name: "Introducción al Cálculo", prereqs: ["mat_intro"] },
+                    { id: "algebra", name: "Álgebra", prereqs: ["mat_intro"] },
+                    { id: "fis_intro", name: "Introducción a la Física", prereqs: [] },
+                    { id: "programacion", name: "Programación", prereqs: [] },
+                    { id: "electivo2", name: "Electivo Formación Integral II", prereqs: [], elective: true },
+                    { id: "ciudadania", name: "Ciudadanía", prereqs: [] }
+                ]
+            },
+            {
+                semester: 3,
+                courses: [
+                    { id: "calc_diff", name: "Cálculo Diferencial e Integral", prereqs: ["calc_intro"] },
+                    { id: "alg_superior", name: "Álgebra Superior", prereqs: ["algebra"] },
+                    { id: "fis_newton", name: "Física Newtoniana", prereqs: ["fis_intro"] },
+                    { id: "termodinamica", name: "Termodinámica", prereqs: ["fis_intro"] },
+                    { id: "ingles1", name: "Inglés I", prereqs: [], english: true },
+                    { id: "electivo3", name: "Electivo Formación Integral III", prereqs: [], elective: true }
+                ]
+            },
+            {
+                semester: 4,
+                courses: [
+                    { id: "calc_multiv", name: "Cálculo Multivariable", prereqs: ["calc_diff"] },
+                    { id: "estadistica", name: "Estadística y Probabilidad", prereqs: ["calc_diff"] },
+                    { id: "mec_resist", name: "Mecánica y Resistencia de Materiales", prereqs: ["fis_newton"] },
+                    { id: "circuitos1", name: "Teoría de Circuitos I", prereqs: ["fis_newton"] },
+                    { id: "electromag", name: "Electromagnetismo", prereqs: ["fis_newton"] },
+                    { id: "ingles2", name: "Inglés II", prereqs: ["ingles1"], english: true }
+                ]
+            },
+            {
+                semester: 5,
+                courses: [
+                    { id: "ec_diff", name: "Ecuaciones Diferenciales", prereqs: ["calc_multiv"] },
+                    { id: "metrologia", name: "Metrología", prereqs: ["fis_newton"] },
+                    { id: "campos_em", name: "Campos Electromagnéticos", prereqs: ["electromag"] },
+                    { id: "circuitos2", name: "Teoría de Circuitos II", prereqs: ["circuitos1"] },
+                    { id: "electronica", name: "Electrónica General", prereqs: ["circuitos1"] },
+                    { id: "ingles3", name: "Inglés III", prereqs: ["ingles2"], english: true }
+                ]
+            },
+            {
+                semester: 6,
+                courses: [
+                    { id: "calc_num", name: "Cálculo Numérico", prereqs: ["ec_diff"] },
+                    { id: "elec_pot", name: "Electrónica de Potencia", prereqs: ["electronica"] },
+                    { id: "conv_energ", name: "Conversión Electromecánica de Energía", prereqs: ["circuitos2"] },
+                    { id: "anal_sen", name: "Análisis de Señales", prereqs: ["circuitos2"] },
+                    { id: "economia", name: "Economía", prereqs: [] },
+                    { id: "ingles4", name: "Inglés IV", prereqs: ["ingles3"], english: true }
+                ]
+            },
+            {
+                semester: 7,
+                courses: [
+                    { id: "control1", name: "Monitoreo y Control Automático I", prereqs: ["ec_diff", "anal_sen"] },
+                    { id: "maq_elect", name: "Máquinas Eléctricas", prereqs: ["conv_energ"] },
+                    { id: "sist_dig", name: "Sistemas Digitales", prereqs: ["electronica"] },
+                    { id: "gestion_emp", name: "Gestión de Empresas", prereqs: ["economia"] },
+                    { id: "taller_ie", name: "Taller de Ingeniería Eléctrica", prereqs: ["circuitos2"] },
+                    { id: "practica_int", name: "Práctica Intermedia", prereqs: [] }
+                ]
+            },
+            {
+                semester: 8,
+                courses: [
+                    { id: "control2", name: "Monitoreo y Control Automático II", prereqs: ["control1"] },
+                    { id: "accionamientos", name: "Accionamientos Eléctricos", prereqs: ["maq_elect"] },
+                    { id: "sist_pot1", name: "Sistemas Eléctricos de Potencia I", prereqs: ["maq_elect"] },
+                    { id: "inv_oper", name: "Investigación Operativa", prereqs: ["estadistica"] },
+                    { id: "electivo4", name: "Electivo de Formación Integral", prereqs: [], elective: true },
+                    { id: "prep_proy", name: "Preparación y Evaluación de Proyectos", prereqs: ["gestion_emp"] }
+                ]
+            },
+            {
+                semester: 9,
+                courses: [
+                    { id: "taller_control", name: "Taller de Control de Procesos", prereqs: ["control2"] },
+                    { id: "centrales", name: "Centrales Eléctricas", prereqs: ["sist_pot1"] },
+                    { id: "sist_pot2", name: "Sistemas Eléctricos de Potencia II", prereqs: ["sist_pot1"] },
+                    { id: "sist_com", name: "Sistemas de Comunicaciones", prereqs: ["anal_sen"] },
+                    { id: "electivo_prof1", name: "Electivo Profesional I", prereqs: [], elective: true },
+                    { id: "electivo_prof2", name: "Electivo Profesional II", prereqs: [], elective: true }
+                ]
+            },
+            {
+                semester: 10,
+                courses: [
+                    { id: "anteproyecto", name: "Anteproyecto de Título", prereqs: ["prep_proy"] },
+                    { id: "taller_energ", name: "Taller de Energía y Eficiencia Energética", prereqs: ["centrales"] },
+                    { id: "legislacion", name: "Legislación Eléctrica", prereqs: [] },
+                    { id: "planificacion", name: "Planificación Eléctrica", prereqs: ["sist_pot2"] },
+                    { id: "electivo_prof3", name: "Electivo Profesional III", prereqs: [], elective: true },
+                    { id: "electivo_prof4", name: "Electivo Profesional IV", prereqs: [], elective: true }
+                ]
+            },
+            {
+                semester: 11,
+                courses: [
+                    { id: "proyecto_titulo", name: "Proyecto de Título", prereqs: ["anteproyecto"] },
+                    { id: "practica_prof", name: "Práctica Profesional", prereqs: [] }
+                ]
+            }
+        ];
+
+        // Estado de los ramos (completados o no)
+        const completedCourses = new Set();
+
+        // Generar la malla en el DOM
+        const container = document.getElementById("malla-container");
+        malla.forEach(semester => {
+            const semesterDiv = document.createElement("div");
+            semesterDiv.className = "semester";
+            semesterDiv.innerHTML = `<h2>Semestre ${semester.semester}</h2>`;
+            
+            semester.courses.forEach(course => {
+                const courseDiv = document.createElement("div");
+                courseDiv.className = "course";
+                if (course.elective) courseDiv.classList.add("elective");
+                if (course.english) courseDiv.classList.add("english");
+                courseDiv.id = `course-${course.id}`;
+                
+                const isLocked = course.prereqs.length > 0 && 
+                                 !course.prereqs.every(prereq => completedCourses.has(prereq));
+                
+                if (isLocked) {
+                    courseDiv.classList.add("locked");
+                }
+                
+                courseDiv.innerHTML = `
+                    <label>
+                        <input 
+                            type="checkbox" 
+                            id="check-${course.id}" 
+                            ${isLocked ? "disabled" : ""}
+                            ${completedCourses.has(course.id) ? "checked" : ""}
+                            onchange="toggleCourse('${course.id}')"
+                        >
+                        <span class="course-name">${course.name}</span>
+                    </label>
+                    <div class="prereq">Prerrequisitos: ${course.prereqs.map(id => {
+                        const courseName = malla.flatMap(s => s.courses).find(c => c.id === id)?.name || id;
+                        return courseName;
+                    }).join(", ") || "Ninguno"}</div>
+                `;
+                
+                semesterDiv.appendChild(courseDiv);
+            });
+            
+            container.appendChild(semesterDiv);
+        });
+
+        // Función para marcar/desmarcar ramos
+        function toggleCourse(courseId) {
+            const checkbox = document.getElementById(`check-${courseId}`);
+            const courseDiv = document.getElementById(`course-${courseId}`);
+            
+            if (checkbox.checked) {
+                completedCourses.add(courseId);
+                courseDiv.classList.add("completed");
+            } else {
+                completedCourses.delete(courseId);
+                courseDiv.classList.remove("completed");
+            }
+            
+            // Actualizar estado de todos los ramos
+            updateCourseStatus();
+        }
+
+        // Actualizar bloqueo/desbloqueo de ramos según prerrequisitos
+        function updateCourseStatus() {
+            malla.forEach(semester => {
+                semester.courses.forEach(course => {
+                    const courseDiv = document.getElementById(`course-${course.id}`);
+                    const checkbox = document.getElementById(`check-${course.id}`);
+                    
+                    const isLocked = course.prereqs.length > 0 && 
+                                     !course.prereqs.every(prereq => completedCourses.has(prereq));
+                    
+                    if (isLocked) {
+                        courseDiv.classList.add("locked");
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                    } else {
+                        courseDiv.classList.remove("locked");
+                        checkbox.disabled = false;
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
